@@ -13,6 +13,7 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
         #loading, #controls, #display {
             display: none;
@@ -43,20 +44,43 @@
             background-color: #00ff00;
             color: #121212;
         }
-        .sound-pad {
-            margin-top: 20px;
+        .social-links {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .social-links a {
+            text-decoration: none;
+            padding: 5px 10px;
+            background-color: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .social-links a:hover {
+            background-color: #00ff00;
+            color: #121212;
         }
     </style>
 </head>
 <body>
+    <div class="social-links">
+        <a href="https://twitter.com" target="_blank">Twitter</a>
+        <a href="https://telegram.org" target="_blank">Telegram</a>
+        <a href="#">CA HERE</a>
+    </div>
+
     <pre id="loading" style="display: block;">E&R104</pre>
     <pre id="display" style="display: none;"></pre>
     <div id="controls" style="display: none;">
-        <button onclick="startDance()">E&R104</button>
+        <button onclick="startDance()">SHOW E&R104</button>
         <button onclick="startWork()">DUMB</button>
         <button onclick="stopAnimation()">ROBOT</button>
-        <button onclick="toggleMusic()">DANCE WITH 104 Music</button>
-        <button onclick="revealTerminal()">What is E&R104?</button>
+        <button onclick="toggleMusic()">DANCE WITH 104 MUSIC</button>
+        <button onclick="revealTerminal()">WHAT IS E&R104?</button>
     </div>
     <div id="terminal"></div>
 
@@ -64,7 +88,7 @@
         <source src="media/MechanicalMotion.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
-    
+
     <script>
         const displayArea = document.getElementById("display");
         const loadingArea = document.getElementById("loading");
@@ -74,7 +98,7 @@
         let currentAnimation = null;
         let musicPlaying = false;
         let musicPlayCount = 0;
-        const maxMusicPlays = 3; // Number of times music will loop before stopping
+        const maxMusicPlays = 3;
 
         const robotFrames = {
             idle: [
@@ -83,9 +107,9 @@
                 |  O O  |
                 |   ^   |
                 |_______|
-                 /|   |\\
-                / |___| \\
-                   / \\
+                 /|   |\
+                / |___| \
+                   / \
                   |   |
                  _|   |_
                 `
@@ -98,7 +122,7 @@
                 |_______|
                   /|   |
                  / |___|
-                   / \\
+                   / \
                   |   |
                  _|   |_
                 `,
@@ -108,8 +132,8 @@
                 |   ^   |
                 |_______|
                    |   |
-                 /|___|\\
-                   / \\
+                 /|___|\
+                   / \
                   |   |
                  _|   |_
                 `
@@ -130,16 +154,16 @@
                  _______
                 |  O O  |       [ Desk   ]
                 |   ^   |       [_______]
-                |_______|       | Write  |
-                  \\|           /| Email  |
-                   \\          / |_______|
+                |_______|       | Buy  |
+                  \|           /| Sell  |
+                   \          / |_______|
                  _/ \\_         _|_______|_
                 `,
                 `
                  _______
                 |  O O  |       [ Desk   ]
                 |   ^   |       [_______]
-                |_______|       | Typing |
+                |_______|       | Pumpfun |
                   /|           /|........|
                    |          / |_______|
                  _/ \\_         _|_______|_
@@ -151,20 +175,20 @@
                 |  O O  |
                 |   ^   |
                 |_______|
-                 /|\\   |
+                 /|\   |
                 / | \\\\  |
-                   / \\
+                   / \
                   |   |
                  _|   |_
                 `,
                 `
                  _______
-                |  \\O/  |
+                |  \O/  |
                 |   ^   |
                 |_______|
-                 /|   |\\
-                / |___| \\
-                   /   \\
+                 /|   |\
+                / |___| \
+                   /   \
                   |     |
                  _|     |_
                 `,
@@ -173,9 +197,9 @@
                 |  O O  |
                 |   ^   |
                 |_______|
-                 \\|   |/
+                 \|   |/
                   |___|
-                   /|\\
+                   /|\
                   | | |
                  _|   |_
                 `
@@ -188,7 +212,7 @@
 
         const animate = (frames, duration, callback) => {
             let frameIndex = 0;
-            stopAnimation(); // Stop any current animation
+            stopAnimation();
             currentAnimation = setInterval(() => {
                 displayFrame(frames[frameIndex]);
                 frameIndex = (frameIndex + 1) % frames.length;
@@ -202,31 +226,29 @@
         };
 
         const stopAnimation = () => {
-                if (currentAnimation) {
-                    clearInterval(currentAnimation);
-                    currentAnimation = null;
-                }
-        // Stop the music if it's playing
-                if (musicPlaying) {
-                    backgroundMusic.pause();
-                    backgroundMusic.currentTime = 0;
-                    musicPlaying = false;
-                    musicPlayCount = 0; // Reset play count
-                }
+            if (currentAnimation) {
+                clearInterval(currentAnimation);
+                currentAnimation = null;
+            }
+            if (musicPlaying) {
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+                musicPlaying = false;
+                musicPlayCount = 0;
+            }
         };
 
-       const startDance = () => {
-        animate(robotFrames.dance, 300);
+        const startDance = () => {
+            animate(robotFrames.dance, 300);
 
-            // Start the music if it's not already playing
             if (!musicPlaying) {
-            backgroundMusic.play();
-            musicPlaying = true;
+                backgroundMusic.play();
+                musicPlaying = true;
             }
         };
 
         const startWork = () => {
-            animate(robotFrames.walkToDesk, 400, () => {
+            animate(robotFrames.walkToDesk, 100, () => {
                 animate(robotFrames.sitAtDesk, 800, () => {
                     setTimeout(() => animate(robotFrames.writeEmail, 400), 2000);
                 });
@@ -238,7 +260,7 @@
                 backgroundMusic.pause();
                 backgroundMusic.currentTime = 0;
                 musicPlaying = false;
-                musicPlayCount = 0; // Reset play count
+                musicPlayCount = 0;
             } else {
                 backgroundMusic.play();
                 musicPlaying = true;
@@ -251,23 +273,15 @@
                 backgroundMusic.pause();
                 backgroundMusic.currentTime = 0;
                 musicPlaying = false;
-                musicPlayCount = 0; // Reset play count
+                musicPlayCount = 0;
             } else {
                 backgroundMusic.play();
             }
         });
 
-        const playSound = (soundId) => {
-            const sound = document.getElementById(`${soundId}-sound`);
-            if (sound) {
-                sound.currentTime = 0; // Reset the sound to start
-                sound.play();
-            }
-        };
-
         const revealTerminal = () => {
             terminal.style.display = "block";
-            const message = "working robot begins with 2025";
+            const message = "It's an euphoric robot that has drunk too much Red Bull. CA will be here once live.";
             let index = 0;
             const typingEffect = setInterval(() => {
                 terminal.textContent += message[index];
@@ -275,12 +289,12 @@
                 if (index >= message.length) {
                     clearInterval(typingEffect);
                 }
-            }, 100); // Adjust typing speed here
+            }, 100);
         };
 
         const startLoading = () => {
-            const interval = 50; // Update frequency
-            const duration = 5000; // Total duration in milliseconds
+            const interval = 50;
+            const duration = 1200;
             const iterations = duration / interval;
             let count = 0;
 
@@ -288,15 +302,12 @@
             displayArea.style.display = "none";
             controlsArea.style.display = "none";
 
-            // Show "E&R104" first
-            loadingArea.textContent = "E&R104";
-
             const loadingAnimation = setInterval(() => {
-                let numbers = "";
+                let numbers = "E&R104\n";
                 for (let i = 0; i < 40; i++) {
                     numbers += Math.floor(Math.random() * 10);
                 }
-                loadingArea.textContent = numbers; // Update with random numbers
+                loadingArea.textContent = numbers;
 
                 count++;
                 if (count >= iterations) {
@@ -308,11 +319,6 @@
             }, interval);
         };
 
-
-
-        // Start the loading animation on page load
         window.onload = startLoading;
     </script>
-
-
 </body></html>
