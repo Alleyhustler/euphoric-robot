@@ -1,0 +1,318 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euphoric & Robot</title>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #121212;
+            color: #00ff00;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #loading, #controls, #display {
+            display: none;
+        }
+        #terminal {
+            margin-top: 20px;
+            width: 80%;
+            border: 1px solid #00ff00;
+            padding: 10px;
+            background-color: #000000;
+            color: #00ff00;
+            font-family: monospace;
+            white-space: pre-wrap;
+            display: none;
+        }
+        pre {
+            line-height: 1.2;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #00ff00;
+            color: #121212;
+        }
+        .sound-pad {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <pre id="loading" style="display: block;">E&R104</pre>
+    <pre id="display" style="display: none;"></pre>
+    <div id="controls" style="display: none;">
+        <button onclick="startDance()">E&R104</button>
+        <button onclick="startWork()">DUMB</button>
+        <button onclick="stopAnimation()">ROBOT</button>
+        <button onclick="toggleMusic()">DANCE WITH 104 Music</button>
+        <button onclick="revealTerminal()">What is E&R104?</button>
+    </div>
+    <div id="terminal"></div>
+
+    <audio id="background-music" loop="">
+        <source src="media/MechanicalMotion.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <script>
+        const displayArea = document.getElementById("display");
+        const loadingArea = document.getElementById("loading");
+        const controlsArea = document.getElementById("controls");
+        const terminal = document.getElementById("terminal");
+        const backgroundMusic = document.getElementById("background-music");
+        let currentAnimation = null;
+        let musicPlaying = false;
+        let musicPlayCount = 0;
+        const maxMusicPlays = 3; // Number of times music will loop before stopping
+
+        const robotFrames = {
+            idle: [
+                `
+                 _______
+                |  O O  |
+                |   ^   |
+                |_______|
+                 /|   |\\
+                / |___| \\
+                   / \\
+                  |   |
+                 _|   |_
+                `
+            ],
+            walkToDesk: [
+                `
+                 _______
+                |  O O  |
+                |   ^   |
+                |_______|
+                  /|   |
+                 / |___|
+                   / \\
+                  |   |
+                 _|   |_
+                `,
+                `
+                 _______
+                |  O O  |
+                |   ^   |
+                |_______|
+                   |   |
+                 /|___|\\
+                   / \\
+                  |   |
+                 _|   |_
+                `
+            ],
+            sitAtDesk: [
+                `
+                 _______
+                |  O O  |       [ Desk   ]
+                |   ^   |       [_______]
+                |_______|       |       |
+                   |           /|       |
+                  / \\         / |       |
+                 _| |_         _|_______|_
+                `
+            ],
+            writeEmail: [
+                `
+                 _______
+                |  O O  |       [ Desk   ]
+                |   ^   |       [_______]
+                |_______|       | Write  |
+                  \\|           /| Email  |
+                   \\          / |_______|
+                 _/ \\_         _|_______|_
+                `,
+                `
+                 _______
+                |  O O  |       [ Desk   ]
+                |   ^   |       [_______]
+                |_______|       | Typing |
+                  /|           /|........|
+                   |          / |_______|
+                 _/ \\_         _|_______|_
+                `
+            ],
+            dance: [
+                `
+                 _______
+                |  O O  |
+                |   ^   |
+                |_______|
+                 /|\\   |
+                / | \\\\  |
+                   / \\
+                  |   |
+                 _|   |_
+                `,
+                `
+                 _______
+                |  \\O/  |
+                |   ^   |
+                |_______|
+                 /|   |\\
+                / |___| \\
+                   /   \\
+                  |     |
+                 _|     |_
+                `,
+                `
+                 _______
+                |  O O  |
+                |   ^   |
+                |_______|
+                 \\|   |/
+                  |___|
+                   /|\\
+                  | | |
+                 _|   |_
+                `
+            ]
+        };
+
+        const displayFrame = (frame) => {
+            displayArea.textContent = frame;
+        };
+
+        const animate = (frames, duration, callback) => {
+            let frameIndex = 0;
+            stopAnimation(); // Stop any current animation
+            currentAnimation = setInterval(() => {
+                displayFrame(frames[frameIndex]);
+                frameIndex = (frameIndex + 1) % frames.length;
+            }, duration);
+            if (callback) {
+                setTimeout(() => {
+                    stopAnimation();
+                    callback();
+                }, frames.length * duration * 2);
+            }
+        };
+
+        const stopAnimation = () => {
+                if (currentAnimation) {
+                    clearInterval(currentAnimation);
+                    currentAnimation = null;
+                }
+        // Stop the music if it's playing
+                if (musicPlaying) {
+                    backgroundMusic.pause();
+                    backgroundMusic.currentTime = 0;
+                    musicPlaying = false;
+                    musicPlayCount = 0; // Reset play count
+                }
+        };
+
+       const startDance = () => {
+        animate(robotFrames.dance, 300);
+
+            // Start the music if it's not already playing
+            if (!musicPlaying) {
+            backgroundMusic.play();
+            musicPlaying = true;
+            }
+        };
+
+        const startWork = () => {
+            animate(robotFrames.walkToDesk, 400, () => {
+                animate(robotFrames.sitAtDesk, 800, () => {
+                    setTimeout(() => animate(robotFrames.writeEmail, 400), 2000);
+                });
+            });
+        };
+
+        const toggleMusic = () => {
+            if (musicPlaying) {
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+                musicPlaying = false;
+                musicPlayCount = 0; // Reset play count
+            } else {
+                backgroundMusic.play();
+                musicPlaying = true;
+            }
+        };
+
+        backgroundMusic.addEventListener("ended", () => {
+            musicPlayCount++;
+            if (musicPlayCount >= maxMusicPlays) {
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+                musicPlaying = false;
+                musicPlayCount = 0; // Reset play count
+            } else {
+                backgroundMusic.play();
+            }
+        });
+
+        const playSound = (soundId) => {
+            const sound = document.getElementById(`${soundId}-sound`);
+            if (sound) {
+                sound.currentTime = 0; // Reset the sound to start
+                sound.play();
+            }
+        };
+
+        const revealTerminal = () => {
+            terminal.style.display = "block";
+            const message = "working robot begins with 2025";
+            let index = 0;
+            const typingEffect = setInterval(() => {
+                terminal.textContent += message[index];
+                index++;
+                if (index >= message.length) {
+                    clearInterval(typingEffect);
+                }
+            }, 100); // Adjust typing speed here
+        };
+
+        const startLoading = () => {
+            const interval = 50; // Update frequency
+            const duration = 5000; // Total duration in milliseconds
+            const iterations = duration / interval;
+            let count = 0;
+
+            loadingArea.style.display = "block";
+            displayArea.style.display = "none";
+            controlsArea.style.display = "none";
+
+            // Show "E&R104" first
+            loadingArea.textContent = "E&R104";
+
+            const loadingAnimation = setInterval(() => {
+                let numbers = "";
+                for (let i = 0; i < 40; i++) {
+                    numbers += Math.floor(Math.random() * 10);
+                }
+                loadingArea.textContent = numbers; // Update with random numbers
+
+                count++;
+                if (count >= iterations) {
+                    clearInterval(loadingAnimation);
+                    loadingArea.style.display = "none";
+                    displayArea.style.display = "block";
+                    controlsArea.style.display = "block";
+                }
+            }, interval);
+        };
+
+
+
+        // Start the loading animation on page load
+        window.onload = startLoading;
+    </script>
+
+
+</body></html>
